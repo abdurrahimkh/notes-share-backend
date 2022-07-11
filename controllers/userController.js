@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/userModel");
 const { OAuth2Client } = require("google-auth-library");
+const { GOOGLE_CLIENT } = process.env;
 /**
  * Register New User
  * POST /api/users
@@ -105,19 +106,15 @@ const getMe = async (req, res) => {
  * Google Login
  * POST /api/google
  */
-const client = new OAuth2Client(
-  "159965697116-t8suhldq94ikeggogj0bevifgqbtcvjj.apps.googleusercontent.com"
-);
+const client = new OAuth2Client(GOOGLE_CLIENT);
 const googleLogin = async (req, res) => {
   const { tokenId } = req.body;
 
   try {
     const response = await client.verifyIdToken({
       idToken: tokenId,
-      audience:
-        "159965697116-t8suhldq94ikeggogj0bevifgqbtcvjj.apps.googleusercontent.com",
+      audience: GOOGLE_CLIENT,
     });
-
     const { email, name } = response.payload;
 
     const salt = await bcrypt.genSalt(10);
@@ -127,10 +124,7 @@ const googleLogin = async (req, res) => {
       email,
       password: hashedPassword,
       username: email.slice(0, -10),
-      // gender="male",
-      // institute=null,
-      // dicipline=null,
-      // fieldofstudy=null,
+      googlenew: false,
     };
     const user = await User.findOne({ email });
 
@@ -145,10 +139,66 @@ const googleLogin = async (req, res) => {
         institute: user.institute,
         dicipline: user.dicipline,
         fieldofstudy: user.fieldofstudy,
+        googlenew: user.googlenew,
       });
     } else {
       const user = await User.create(newUser);
-      res.json({ user });
+      res.status(200).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        token: generateToken(user._id),
+        username: user.username,
+        googlenew: user.googlenew,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+/**
+ * Google Complete Registration
+ * POST /api/google/complete
+ */
+const completeRegistration = async (req, res) => {
+  const {
+    _id,
+    username,
+    gender,
+    institute,
+    dicipline,
+    fieldofstudy,
+    googlenew,
+  } = req.body;
+  try {
+    const user = await User.findByIdAndUpdate(
+      _id,
+      {
+        $set: {
+          username,
+          gender,
+          institute,
+          dicipline,
+          fieldofstudy,
+          googlenew: true,
+        },
+      },
+      { new: true }
+    );
+    if (user) {
+      res.status(200).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        token: generateToken(user._id),
+        gender: user.gender,
+        username: user.username,
+        institute: user.institute,
+        dicipline: user.dicipline,
+        fieldofstudy: user.fieldofstudy,
+        googlenew: user.googlenew,
+      });
     }
   } catch (error) {
     console.log(error);
@@ -166,4 +216,5 @@ module.exports = {
   loginUser,
   googleLogin,
   getMe,
+  completeRegistration,
 };
