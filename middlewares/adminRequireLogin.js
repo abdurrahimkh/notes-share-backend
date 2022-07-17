@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/userModel");
+const Admin = require("../models/adminModel");
 
-const requireLogin = async (req, res, next) => {
+const adminRequireLogin = async (req, res, next) => {
   let token;
   if (
     req.headers.authorization &&
@@ -11,7 +11,7 @@ const requireLogin = async (req, res, next) => {
       token = req.headers.authorization.split(" ")[1];
       console.log("REQUIRE LOGIN", token);
       const decode = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decode.id).select("-password");
+      req.user = await Admin.findById(decode.id).select("-password");
       next();
     } catch (error) {
       console.log(error);
@@ -24,4 +24,4 @@ const requireLogin = async (req, res, next) => {
   }
 };
 
-module.exports = { requireLogin };
+module.exports = { adminRequireLogin };

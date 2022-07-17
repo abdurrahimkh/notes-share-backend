@@ -50,6 +50,7 @@ const registerUser = async (req, res) => {
     institute,
     dicipline,
     fieldofstudy,
+    pic,
   });
   if (user) {
     res.status(201).json({
@@ -83,6 +84,7 @@ const loginUser = async (req, res) => {
       _id: user.id,
       name: user.name,
       email: user.email,
+      pic: user.pic,
       token: generateToken(user.id),
     });
   } else {
@@ -115,7 +117,7 @@ const googleLogin = async (req, res) => {
       idToken: tokenId,
       audience: GOOGLE_CLIENT,
     });
-    const { email, name } = response.payload;
+    const { email, name, picture } = response.payload;
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(email, salt);
@@ -124,10 +126,10 @@ const googleLogin = async (req, res) => {
       email,
       password: hashedPassword,
       username: email.slice(0, -10),
+      pic: picture,
       googlenew: false,
     };
     const user = await User.findOne({ email });
-
     if (user) {
       res.status(200).json({
         _id: user._id,
@@ -139,6 +141,7 @@ const googleLogin = async (req, res) => {
         institute: user.institute,
         dicipline: user.dicipline,
         fieldofstudy: user.fieldofstudy,
+        pic: user.pic,
         googlenew: user.googlenew,
       });
     } else {

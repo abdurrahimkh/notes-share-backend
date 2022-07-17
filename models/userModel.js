@@ -16,7 +16,6 @@ const userSchema = mongoose.Schema(
     },
     gender: {
       type: String,
-      // required: true,
     },
     username: {
       type: String,
@@ -26,21 +25,23 @@ const userSchema = mongoose.Schema(
     },
     institute: {
       type: String,
-      // required: true,
       lowercase: true,
     },
     dicipline: {
       type: String,
-      // required: true,
       lowercase: true,
     },
     fieldofstudy: {
       type: String,
-      // required: true,
       lowercase: true,
     },
     googlenew: {
       type: Boolean,
+    },
+    pic: {
+      type: String,
+      default:
+        "https://res.cloudinary.com/fypproject07/image/upload/v1657778307/istockphoto-1223671392-612x612_n6cafa.jpg",
     },
   },
   {
