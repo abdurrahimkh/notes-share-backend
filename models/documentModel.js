@@ -24,17 +24,15 @@ const documentSchema = new mongoose.Schema(
     size: {
       type: String,
     },
+    status: {
+      type: String,
+      default: "pending",
+    },
     postedBy: {
       type: mongoose.Types.ObjectId,
       ref: "User",
     },
     likes: [{ type: mongoose.Types.ObjectId, ref: "User" }],
-    // comments: [
-    //   {
-    //     text: String,
-    //     postedBy: { type: mongoose.Types.ObjectId, ref: "User" },
-    //   },
-    // ],
   },
   {
     timestamps: true,

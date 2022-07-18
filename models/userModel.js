@@ -41,7 +41,11 @@ const userSchema = mongoose.Schema(
     pic: {
       type: String,
       default:
-        "https://res.cloudinary.com/fypproject07/image/upload/v1657778307/istockphoto-1223671392-612x612_n6cafa.jpg",
+        "https://res.cloudinary.com/fypproject07/image/upload/v1658128804/profile_gojfyg.png",
+    },
+    role: {
+      type: String,
+      default: "user",
     },
   },
   {

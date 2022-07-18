@@ -9,7 +9,6 @@ const adminRequireLogin = async (req, res, next) => {
   ) {
     try {
       token = req.headers.authorization.split(" ")[1];
-      console.log("REQUIRE LOGIN", token);
       const decode = jwt.verify(token, process.env.JWT_SECRET);
       req.user = await Admin.findById(decode.id).select("-password");
       next();

@@ -50,7 +50,6 @@ const registerUser = async (req, res) => {
     institute,
     dicipline,
     fieldofstudy,
-    pic,
   });
   if (user) {
     res.status(201).json({
@@ -63,6 +62,8 @@ const registerUser = async (req, res) => {
       institute: user.institute,
       dicipline: user.dicipline,
       fieldofstudy: user.fieldofstudy,
+      pic: user.pic,
+      roel: user.role,
     });
   } else {
     throw new Error("Invalid User Details");
@@ -86,6 +87,7 @@ const loginUser = async (req, res) => {
       email: user.email,
       pic: user.pic,
       token: generateToken(user.id),
+      role: user.role,
     });
   } else {
     res.json({ error: "Invalid Email or Password" });
@@ -143,6 +145,7 @@ const googleLogin = async (req, res) => {
         fieldofstudy: user.fieldofstudy,
         pic: user.pic,
         googlenew: user.googlenew,
+        role: user.role,
       });
     } else {
       const user = await User.create(newUser);
@@ -153,6 +156,7 @@ const googleLogin = async (req, res) => {
         token: generateToken(user._id),
         username: user.username,
         googlenew: user.googlenew,
+        role: user.role,
       });
     }
   } catch (error) {
@@ -214,10 +218,26 @@ const generateToken = id => {
   });
 };
 
+/**
+ * Get All Users
+ * GET /api/users/allUsers
+ */
+
+const allUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    if (users) {
+      res.status(200).send(users);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   registerUser,
   loginUser,
   googleLogin,
   getMe,
   completeRegistration,
+  allUsers,
 };

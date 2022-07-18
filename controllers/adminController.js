@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const Admin = require("../models/adminModel");
+const userModel = require("../models/userModel");
 
 const generateToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -52,13 +53,28 @@ const loginAdmin = async (req, res) => {
       name: user.name,
       email: user.email,
       token: generateToken(user.id),
+      role: user.role,
     });
   } else {
     res.json({ error: "Invalid Email or Password" });
   }
 };
 
+const deleteUser = async (req, res) => {
+  const id = req.params.id;
+  if (!id) {
+    req.status(400).json({ message: "No ID" });
+  }
+  const deleteUser = await userModel.findByIdAndRemove(id);
+  if (deleteUser) {
+    res.status(200).send(deleteUser);
+  } else {
+    res.json({ error: "Something went wrong" });
+  }
+};
+
 module.exports = {
   registerAdmin,
   loginAdmin,
+  deleteUser,
 };
