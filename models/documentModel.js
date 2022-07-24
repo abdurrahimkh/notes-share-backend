@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const { ObjectId } = mongoose.Schema.Types;
 const documentSchema = new mongoose.Schema(
   {
     title: {
@@ -29,10 +29,13 @@ const documentSchema = new mongoose.Schema(
       default: "pending",
     },
     postedBy: {
-      type: mongoose.Types.ObjectId,
+      type: ObjectId,
       ref: "User",
     },
-    likes: [{ type: mongoose.Types.ObjectId, ref: "User" }],
+    likes: {
+      type: [String],
+      default: [],
+    },
   },
   {
     timestamps: true,

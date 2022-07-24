@@ -1,14 +1,12 @@
 const documentModel = require("../models/documentModel");
-
 const uploadDocument = async (req, res) => {
-  const { url, title, course, subject, discription, size, filetype, postedBy } =
-    req.body;
+  const { url, title, course, subject, description, size, filetype } = req.body;
   try {
     const post = await documentModel.create({
       title,
       course,
       subject,
-      discription,
+      description,
       url,
       size,
       filetype,
@@ -76,7 +74,9 @@ const Reject = async (req, res) => {
 
 const approvedDocuments = async (req, res) => {
   try {
-    const documents = await documentModel.find({ status: "approved" });
+    const documents = await documentModel
+      .find({ status: "approved" })
+      .populate("postedBy", "name pic");
     if (documents) {
       res.status(200).send(documents);
     }
@@ -85,10 +85,32 @@ const approvedDocuments = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+const likeDocument = async (req, res) => {
+  const { documentId } = req.params;
+  const id = req.user._id;
+  try {
+    const document = await documentModel.findByIdAndUpdate(
+      documentId,
+      {
+        $addToSet: { likes: id },
+      },
+      { new: true }
+    );
+    if (document) {
+      res.status(200).send(document);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   uploadDocument,
   AllDocuments,
   Approve,
   Reject,
   approvedDocuments,
+  likeDocument,
 };

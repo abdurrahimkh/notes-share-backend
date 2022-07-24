@@ -3,6 +3,26 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/userModel");
 const { OAuth2Client } = require("google-auth-library");
 const { GOOGLE_CLIENT } = process.env;
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+const documentModel = require("../models/documentModel");
+const transport = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "abdurrahimkhan95710@gmail.com",
+    pass: "npgnhjvqidajbrhi",
+  },
+  from: "notes-share@gmail.com",
+});
+
+transport.verify((err, succ) => {
+  if (err) {
+    console.log(err);
+  } else if (succ) {
+    console.log("Mail Service Connected");
+  }
+});
+
 /**
  * Register New User
  * POST /api/users
@@ -233,6 +253,85 @@ const allUsers = async (req, res) => {
     console.log(error);
   }
 };
+
+/**
+ * Reset Passowrd
+ * POST /api/users/forgetpassword
+ */
+const forgetPassword = async (req, res) => {
+  try {
+    crypto.randomBytes(32, async (err, buffer) => {
+      if (err) {
+        console.log(err);
+      }
+      const token = buffer.toString("hex");
+      const user = await User.findOne({ email: req.body.email });
+      if (!user) {
+        return res.status(200).json({ error: "Email does not exists" });
+      }
+      user.resettoken = token;
+      user.expiretoken = Date.now() + 3600000;
+      await user.save();
+      transport.sendMail({
+        to: user.email,
+        from: "noreply@notes-share.com",
+        subject: "Password  Reset",
+        html: `
+                  <h2>Hi ${user.name},</h2>
+                 <h3> There was a request to change your password!</h3>
+                 <span>If you did not make this request then please ignore this email.</span>
+                  <h4>  Otherwise, please click this link to change your password: <a  href="http://localhost:3000/forgetpassword/${token}">link</a> </h4>
+                        `,
+      });
+      res.json({ message: "Email has been sent " });
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+/**
+ * New Passowrd
+ * POST /api/users/newpassword
+ */
+const newPassword = async (req, res) => {
+  const newPassword = req.body.password;
+  const sentToken = req.body.token;
+  const user = await User.findOne({
+    resettoken: sentToken,
+    expiretoken: { $gt: Date.now() },
+  });
+  if (!user) {
+    return res
+      .status(200)
+      .json({ error: "Session Expired :pensive: Try Again!" });
+  }
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
+  user.password = hashedPassword;
+  user.resettoken = undefined;
+  user.expiretoken = undefined;
+  const updated = user.save();
+  if (updated) {
+    res.status(201).json({ message: "Password Updated Successfully" });
+  }
+};
+
+const userProfile = async (req, res) => {
+  const id = req.params;
+  const _id = id;
+  try {
+    const user = await User.findById(id);
+    const documents = await documentModel.find({ postedBy: _id });
+
+    if (user) {
+      res.status(200).json({ user, documents });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -240,4 +339,7 @@ module.exports = {
   getMe,
   completeRegistration,
   allUsers,
+  forgetPassword,
+  newPassword,
+  userProfile,
 };
