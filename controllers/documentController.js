@@ -1,4 +1,5 @@
 const documentModel = require("../models/documentModel");
+const valuesModel = require("../models/valuesModel");
 const uploadDocument = async (req, res) => {
   const { url, title, course, subject, description, size, filetype } = req.body;
   try {
@@ -106,6 +107,16 @@ const likeDocument = async (req, res) => {
   }
 };
 
+const valuesControl = async (req, res) => {
+  try {
+    const data = await valuesModel.find();
+    res.send(data);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   uploadDocument,
   AllDocuments,
@@ -113,4 +124,5 @@ module.exports = {
   Reject,
   approvedDocuments,
   likeDocument,
+  valuesControl,
 };

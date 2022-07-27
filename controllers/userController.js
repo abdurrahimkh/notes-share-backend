@@ -6,6 +6,7 @@ const { GOOGLE_CLIENT } = process.env;
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const documentModel = require("../models/documentModel");
+const valuesModel = require("../models/valuesModel");
 const transport = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -332,6 +333,37 @@ const userProfile = async (req, res) => {
   }
 };
 
+const addValue = async (req, res) => {
+  const { id, newValue } = req.body;
+  if (id === "62df6ccc14cb3a595f1c581d") {
+    try {
+      const updated = await valuesModel.findByIdAndUpdate(
+        id,
+        {
+          $addToSet: { universities: { label: newValue, value: newValue } },
+        },
+        { new: true }
+      );
+      res.status(201).send(updated);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  if (id === "62e0de0f5a25e2cd79eec494") {
+    try {
+      const updated = await valuesModel.findByIdAndUpdate(
+        id,
+        {
+          $addToSet: { fieldofstudy: { label: newValue, value: newValue } },
+        },
+        { new: true }
+      );
+      res.status(201).send(updated);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+};
 module.exports = {
   registerUser,
   loginUser,
@@ -342,4 +374,5 @@ module.exports = {
   forgetPassword,
   newPassword,
   userProfile,
+  addValue,
 };

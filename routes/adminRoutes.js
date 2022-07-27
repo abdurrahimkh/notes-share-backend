@@ -9,4 +9,5 @@ const {
 router.post("/register", registerAdmin);
 router.post("/login", loginAdmin);
 router.delete("/delete/user/:id", deleteUser);
+
 module.exports = router;
