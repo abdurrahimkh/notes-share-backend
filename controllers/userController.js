@@ -140,6 +140,7 @@ const googleLogin = async (req, res) => {
       idToken: tokenId,
       audience: GOOGLE_CLIENT,
     });
+
     const { email, name, picture } = response.payload;
 
     const salt = await bcrypt.genSalt(10);
@@ -169,15 +170,15 @@ const googleLogin = async (req, res) => {
         role: user.role,
       });
     } else {
-      const user = await User.create(newUser);
+      const createNewUser = await User.create(newUser);
       res.status(200).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        token: generateToken(user._id),
-        username: user.username,
-        googlenew: user.googlenew,
-        role: user.role,
+        _id: createNewUser._id,
+        name: createNewUser.name,
+        email: createNewUser.email,
+        token: generateToken(createNewUser._id),
+        username: createNewUser.username,
+        googlenew: createNewUser.googlenew,
+        role: createNewUser.role,
       });
     }
   } catch (error) {
