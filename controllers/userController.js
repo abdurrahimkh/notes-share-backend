@@ -108,6 +108,9 @@ const loginUser = async (req, res) => {
       email: user.email,
       pic: user.pic,
       token: generateToken(user.id),
+      institute: user.institute,
+      dicipline: user.dicipline,
+      fieldofstudy: user.fieldofstudy,
       role: user.role,
     });
   } else {
@@ -335,7 +338,8 @@ const userProfile = async (req, res) => {
 };
 
 const addValue = async (req, res) => {
-  const { id, newValue } = req.body;
+  const { id, newValue, field } = req.body;
+
   if (id === "62df6ccc14cb3a595f1c581d") {
     try {
       const updated = await valuesModel.findByIdAndUpdate(
@@ -349,13 +353,25 @@ const addValue = async (req, res) => {
     } catch (error) {
       console.log(error);
     }
-  }
-  if (id === "62e0de0f5a25e2cd79eec494") {
+  } else if (id === "62e0de0f5a25e2cd79eec494") {
     try {
       const updated = await valuesModel.findByIdAndUpdate(
         id,
         {
           $addToSet: { fieldofstudy: { label: newValue, value: newValue } },
+        },
+        { new: true }
+      );
+      res.status(201).send(updated);
+    } catch (error) {
+      console.log(error);
+    }
+  } else if (id === "62e36574bca949a2bfca94ee") {
+    try {
+      const updated = await valuesModel.findByIdAndUpdate(
+        id,
+        {
+          $addToSet: { subjects: { label: newValue, value: newValue, field } },
         },
         { new: true }
       );

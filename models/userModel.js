@@ -25,15 +25,12 @@ const userSchema = mongoose.Schema(
     },
     institute: {
       type: String,
-      lowercase: true,
     },
     dicipline: {
       type: String,
-      lowercase: true,
     },
     fieldofstudy: {
       type: String,
-      lowercase: true,
     },
     googlenew: {
       type: Boolean,

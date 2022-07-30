@@ -1,7 +1,8 @@
 const documentModel = require("../models/documentModel");
 const valuesModel = require("../models/valuesModel");
 const uploadDocument = async (req, res) => {
-  const { url, title, course, subject, description, size, filetype } = req.body;
+  const { url, title, course, subject, description, size, filetype, field } =
+    req.body;
   try {
     const post = await documentModel.create({
       title,
@@ -11,6 +12,7 @@ const uploadDocument = async (req, res) => {
       url,
       size,
       filetype,
+      field,
       postedBy: req.user,
     });
     console.log(post);

@@ -9,7 +9,10 @@ const documentSchema = new mongoose.Schema(
     subject: {
       type: String,
       required: true,
-      lowercase: true,
+    },
+    field: {
+      type: String,
+      required: true,
     },
     description: {
       type: String,
