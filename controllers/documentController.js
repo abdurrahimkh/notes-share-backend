@@ -119,6 +119,23 @@ const valuesControl = async (req, res) => {
   }
 };
 
+const Search = async (req, res) => {
+  try {
+    const searchField = req.query.field;
+    const searchSubject = req.query.subject;
+
+    const data = await documentModel
+      .find({
+        $or: [{ field: searchField }, { subject: searchSubject }],
+      })
+      .populate("postedBy", "name pic");
+    res.send(data);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   uploadDocument,
   AllDocuments,
@@ -127,4 +144,5 @@ module.exports = {
   approvedDocuments,
   likeDocument,
   valuesControl,
+  Search,
 };
