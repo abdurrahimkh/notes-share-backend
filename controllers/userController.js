@@ -7,6 +7,7 @@ const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const documentModel = require("../models/documentModel");
 const valuesModel = require("../models/valuesModel");
+const userModel = require("../models/userModel");
 const transport = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -322,6 +323,10 @@ const newPassword = async (req, res) => {
   }
 };
 
+/**
+ * User Profile
+ * GET /api/users/profile/:id
+ */
 const userProfile = async (req, res) => {
   const id = req.params;
   const _id = id;
@@ -337,6 +342,10 @@ const userProfile = async (req, res) => {
   }
 };
 
+/**
+ * User Profile
+ * PUT /api/users/addvalue
+ */
 const addValue = async (req, res) => {
   const { id, newValue, field } = req.body;
 
@@ -381,6 +390,63 @@ const addValue = async (req, res) => {
     }
   }
 };
+
+/**
+ * Update Profile Picture
+ * PUT /api/users/profile/picupdate/:id
+ */
+const updatePicture = async (req, res) => {
+  const _id = req.params;
+  try {
+    const updatePic = await User.findByIdAndUpdate(
+      _id,
+      {
+        pic: req.body.pic,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (updatePic) {
+      res
+        .status(200)
+        .json({ message: "Update Successful", pic: updatePic.pic });
+    }
+  } catch (error) {
+    res.status(200).json({ error: error.message });
+  }
+};
+
+/**
+ * Update Profile Picture
+ * PUT /api/users/profile/update/:id
+ */
+
+const profileUpdate = async (req, res) => {
+  console.log(req.body.name);
+  try {
+    const user = await userModel.findById(req.user._id);
+    if (user) {
+      user.email = req.body.email || user.email;
+      user.name = req.body.name || user.name;
+      user.username = req.body.username || user.username;
+      user.gender = req.body.gender || user.gender;
+      user.fieldofstudy = req.body.fieldofstudy || user.fieldofstudy;
+      user.dicipline = req.body.dicipline || user.dicipline;
+      user.institute = req.body.institute || user.institute;
+    }
+    if (req.body.password) {
+      user.password = req.body.password;
+    }
+    const updateInfo = await user.save();
+    res.send(updateInfo);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -392,4 +458,6 @@ module.exports = {
   newPassword,
   userProfile,
   addValue,
+  updatePicture,
+  profileUpdate,
 };

@@ -12,6 +12,8 @@ const {
   newPassword,
   userProfile,
   addValue,
+  updatePicture,
+  profileUpdate,
 } = require("../controllers/userController");
 const { adminRequireLogin } = require("../middlewares/adminRequireLogin");
 
@@ -25,5 +27,7 @@ router.post("/forgetpassword", forgetPassword);
 router.post("/newPassword", newPassword);
 router.get("/profile/:_id", userProfile);
 router.put("/addvalue", addValue);
+router.put("/profile/picupdate/:_id", updatePicture);
+router.put("/profile/update", requireLogin, profileUpdate);
 
 module.exports = router;
