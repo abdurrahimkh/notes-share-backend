@@ -1,8 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/userModel");
-const { OAuth2Client } = require("google-auth-library");
-const { GOOGLE_CLIENT } = process.env;
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const documentModel = require("../models/documentModel");
@@ -135,28 +133,19 @@ const getMe = async (req, res) => {
  * Google Login
  * POST /api/google
  */
-const client = new OAuth2Client(GOOGLE_CLIENT);
 const googleLogin = async (req, res) => {
-  const { tokenId } = req.body;
-
+  const { email, name, picture } = req.body;
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(email, salt);
+  const newUser = {
+    name,
+    email,
+    password: hashedPassword,
+    username: email.slice(0, -10),
+    pic: picture,
+    googlenew: false,
+  };
   try {
-    const response = await client.verifyIdToken({
-      idToken: tokenId,
-      audience: GOOGLE_CLIENT,
-    });
-
-    const { email, name, picture } = response.payload;
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(email, salt);
-    const newUser = {
-      name,
-      email,
-      password: hashedPassword,
-      username: email.slice(0, -10),
-      pic: picture,
-      googlenew: false,
-    };
     const user = await User.findOne({ email });
     if (user) {
       res.status(200).json({
@@ -175,15 +164,18 @@ const googleLogin = async (req, res) => {
       });
     } else {
       const createNewUser = await User.create(newUser);
-      res.status(200).json({
-        _id: createNewUser._id,
-        name: createNewUser.name,
-        email: createNewUser.email,
-        token: generateToken(createNewUser._id),
-        username: createNewUser.username,
-        googlenew: createNewUser.googlenew,
-        role: createNewUser.role,
-      });
+      if (createNewUser) {
+        res.status(200).json({
+          _id: createNewUser._id,
+          name: createNewUser.name,
+          email: createNewUser.email,
+          pic: createNewUser.pic,
+          token: generateToken(createNewUser._id),
+          username: createNewUser.username,
+          googlenew: createNewUser.googlenew,
+          role: createNewUser.role,
+        });
+      }
     }
   } catch (error) {
     console.log(error);
@@ -224,6 +216,7 @@ const completeRegistration = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        pic: user.pic,
         token: generateToken(user._id),
         gender: user.gender,
         username: user.username,
