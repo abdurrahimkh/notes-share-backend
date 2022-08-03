@@ -424,7 +424,8 @@ const updatePicture = async (req, res) => {
  */
 
 const profileUpdate = async (req, res) => {
-  console.log(req.body.name);
+  const currenPassword = req.body.currentpassword;
+  const newPassword = req.body.newpassword;
   try {
     const user = await userModel.findById(req.user._id);
     if (user) {
@@ -435,18 +436,43 @@ const profileUpdate = async (req, res) => {
       user.fieldofstudy = req.body.fieldofstudy || user.fieldofstudy;
       user.dicipline = req.body.dicipline || user.dicipline;
       user.institute = req.body.institute || user.institute;
+
+      const updateInfo = await user.save();
+      res.send(updateInfo);
     }
-    if (req.body.password) {
-      user.password = req.body.password;
-    }
-    const updateInfo = await user.save();
-    res.send(updateInfo);
   } catch (error) {
     console.log(error);
     res.status(400).json({ error: error.message });
   }
 };
 
+const passwordUpdate = async (req, res) => {
+  const currenPassword = req.body.currentpassword;
+  const newPassword = req.body.newpassword;
+  if (currenPassword === undefined || newPassword === undefined) {
+    return res.json({ error: "Fill Both Fields" });
+  }
+  try {
+    const user = await userModel.findById(req.user._id);
+    if (user) {
+      if (currenPassword) {
+        const matched = await bcrypt.compare(currenPassword, user.password);
+        if (matched) {
+          const salt = await bcrypt.genSalt(10);
+          const hashedPassword = await bcrypt.hash(newPassword, salt);
+          user.password = hashedPassword;
+          await user.save();
+          return res.json({ message: "Password Changed Successfully" });
+        } else {
+          return res.json({ error: "Incorrect Current Password" });
+        }
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ error: error.message });
+  }
+};
 module.exports = {
   registerUser,
   loginUser,
@@ -460,4 +486,5 @@ module.exports = {
   addValue,
   updatePicture,
   profileUpdate,
+  passwordUpdate,
 };

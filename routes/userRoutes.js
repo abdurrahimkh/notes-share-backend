@@ -14,6 +14,7 @@ const {
   addValue,
   updatePicture,
   profileUpdate,
+  passwordUpdate,
 } = require("../controllers/userController");
 const { adminRequireLogin } = require("../middlewares/adminRequireLogin");
 
@@ -29,5 +30,6 @@ router.get("/profile/:_id", userProfile);
 router.put("/addvalue", addValue);
 router.put("/profile/picupdate/:_id", updatePicture);
 router.put("/profile/update", requireLogin, profileUpdate);
+router.put("/profile/passwordupdate", requireLogin, passwordUpdate);
 
 module.exports = router;
