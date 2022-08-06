@@ -27,7 +27,9 @@ const uploadDocument = async (req, res) => {
 
 const AllDocuments = async (req, res) => {
   try {
-    const posts = await documentModel.find();
+    const posts = await documentModel
+      .find()
+      .populate("postedBy", "name username email");
     if (posts) {
       res.status(200).send(posts);
     }

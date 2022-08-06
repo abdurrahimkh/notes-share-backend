@@ -336,7 +336,7 @@ const userProfile = async (req, res) => {
 };
 
 /**
- * User Profile
+ * ADD VALUE
  * PUT /api/users/addvalue
  */
 const addValue = async (req, res) => {
@@ -378,6 +378,64 @@ const addValue = async (req, res) => {
         { new: true }
       );
       res.status(201).send(updated);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+};
+
+/**
+ * Delete Value
+ * PUT /api/users/addvalue
+ */
+const deleteValue = async (req, res) => {
+  const { id, value } = req.body;
+
+  if (id === "62df6ccc14cb3a595f1c581d") {
+    try {
+      const updated = await valuesModel.findByIdAndUpdate(
+        id,
+        {
+          $pull: { universities: { label: value } },
+        },
+        { new: true }
+      );
+      if (updated) {
+        const data = await valuesModel.find();
+        res.status(201).send(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  } else if (id === "62e0de0f5a25e2cd79eec494") {
+    try {
+      const updated = await valuesModel.findByIdAndUpdate(
+        id,
+        {
+          $pull: { fieldofstudy: { label: value } },
+        },
+        { new: true }
+      );
+      if (updated) {
+        const data = await valuesModel.find();
+        res.status(201).send(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  } else if (id === "62e36574bca949a2bfca94ee") {
+    try {
+      const updated = await valuesModel.findByIdAndUpdate(
+        id,
+        {
+          $pull: { subjects: { label: value } },
+        },
+        { new: true }
+      );
+      if (updated) {
+        const data = await valuesModel.find();
+        res.status(201).send(data);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -480,4 +538,5 @@ module.exports = {
   updatePicture,
   profileUpdate,
   passwordUpdate,
+  deleteValue,
 };
