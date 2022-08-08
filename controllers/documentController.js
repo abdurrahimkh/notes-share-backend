@@ -128,6 +128,7 @@ const Search = async (req, res) => {
 
     const data = await documentModel
       .find({
+        status: "approved",
         $or: [{ field: searchField }, { subject: searchSubject }],
       })
       .populate("postedBy", "name pic");

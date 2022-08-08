@@ -48,16 +48,20 @@ const registerUser = async (req, res) => {
     !dicipline ||
     !fieldofstudy
   ) {
-    res.status(400);
+    res.status(200);
     res.json({ error: "Please Add All Fields" });
   }
 
   const userExists = await User.findOne({ email });
   if (userExists) {
-    res.status(400);
-    res.json({ error: "User Already Exists" });
+    res.status(200);
+    return res.json({ error: "User Already Exists" });
   }
-
+  const usernameExists = await User.findOne({ username });
+  if (usernameExists) {
+    res.status(200);
+    return res.json({ error: "Username already exists" });
+  }
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -325,7 +329,10 @@ const userProfile = async (req, res) => {
   const _id = id;
   try {
     const user = await User.findById(id);
-    const documents = await documentModel.find({ postedBy: _id });
+    const documents = await documentModel.find({
+      status: "approved",
+      postedBy: _id,
+    });
 
     if (user) {
       res.status(200).json({ user, documents });
@@ -475,8 +482,6 @@ const updatePicture = async (req, res) => {
  */
 
 const profileUpdate = async (req, res) => {
-  const currenPassword = req.body.currentpassword;
-  const newPassword = req.body.newpassword;
   try {
     const user = await userModel.findById(req.user._id);
     if (user) {
