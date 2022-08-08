@@ -77,9 +77,25 @@ const deleteAnswer = async (req, res) => {
   }
 };
 
+const questionDetails = async (req, res) => {
+  const id = req.params;
+  try {
+    const question = await QuestionModel.findById(id).populate(
+      "postedBy",
+      "name pic"
+    );
+    if (question) {
+      res.send(question);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   addQuestion,
   allQuestions,
   addAnswer,
   deleteAnswer,
+  questionDetails,
 };
