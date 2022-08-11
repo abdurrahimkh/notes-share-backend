@@ -45,7 +45,9 @@ const addAnswer = async (req, res) => {
         },
       },
       { new: true }
-    );
+    )
+      .populate("postedBy", "name pic")
+      .populate("answers.answerBy", "name pic");
     if (comment) {
       res.send(comment);
     }
@@ -68,7 +70,9 @@ const deleteAnswer = async (req, res) => {
         },
       },
       { new: true }
-    );
+    )
+      .populate("postedBy", "name pic")
+      .populate("answers.answerBy", "name pic");
     if (comment) {
       res.send(comment);
     }
@@ -80,10 +84,9 @@ const deleteAnswer = async (req, res) => {
 const questionDetails = async (req, res) => {
   const id = req.params;
   try {
-    const question = await QuestionModel.findById(id).populate(
-      "postedBy",
-      "name pic"
-    );
+    const question = await QuestionModel.findById(id)
+      .populate("postedBy", "name pic")
+      .populate("answers.answerBy", "_id name pic");
     if (question) {
       res.send(question);
     }

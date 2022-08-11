@@ -14,6 +14,7 @@ const questionSchema = mongoose.Schema(
         text: String,
         file: String,
         answerBy: { type: ObjectId, ref: "User" },
+        createdAt: { type: Date, default: Date.now },
       },
     ],
   },
