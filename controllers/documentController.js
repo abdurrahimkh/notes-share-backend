@@ -39,6 +39,21 @@ const AllDocuments = async (req, res) => {
   }
 };
 
+const documentDetails = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const document = await documentModel
+      .findById(id)
+      .populate("postedBy", "name username email pic");
+    if (document) {
+      res.send(document);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
 const Approve = async (req, res) => {
   const id = req.params.id;
   try {
@@ -141,6 +156,7 @@ const Search = async (req, res) => {
 
 module.exports = {
   uploadDocument,
+  documentDetails,
   AllDocuments,
   Approve,
   Reject,

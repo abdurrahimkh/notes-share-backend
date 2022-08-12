@@ -3,6 +3,7 @@ const { adminRequireLogin } = require("../middlewares/adminRequireLogin");
 const {
   uploadDocument,
   AllDocuments,
+  documentDetails,
   Approve,
   Reject,
   approvedDocuments,
@@ -16,6 +17,7 @@ const router = express.Router();
 
 router.post("/upload", requireLogin, uploadDocument);
 router.get("/documents", AllDocuments);
+router.get("/document/:id", documentDetails);
 router.post("/approve/:id", adminRequireLogin, Approve);
 router.post("/reject/:id", adminRequireLogin, Reject);
 router.get("/approved", approvedDocuments);
