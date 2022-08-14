@@ -36,7 +36,7 @@ const userSchema = mongoose.Schema(
     pic: {
       type: String,
       default:
-        "https://res.cloudinary.com/fypproject07/image/upload/v1658128804/profile_gojfyg.png",
+        "https://res.cloudinary.com/fypproject07/image/upload/v1660389937/3177440_i23rlb.png",
     },
     role: {
       type: String,

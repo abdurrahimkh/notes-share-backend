@@ -25,6 +25,19 @@ const uploadDocument = async (req, res) => {
   }
 };
 
+const deleteDocument = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const deletedDocument = await documentModel.findByIdAndDelete(id);
+    if (deletedDocument) {
+      res.status(200).send(deletedDocument);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
 const AllDocuments = async (req, res) => {
   try {
     const posts = await documentModel
@@ -164,4 +177,5 @@ module.exports = {
   likeDocument,
   valuesControl,
   Search,
+  deleteDocument,
 };

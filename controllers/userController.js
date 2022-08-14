@@ -138,7 +138,7 @@ const getMe = async (req, res) => {
  * POST /api/google
  */
 const googleLogin = async (req, res) => {
-  const { email, name, picture } = req.body;
+  const { email, name } = req.body;
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(email, salt);
   const newUser = {
@@ -146,7 +146,6 @@ const googleLogin = async (req, res) => {
     email,
     password: hashedPassword,
     username: email.slice(0, -10),
-    pic: picture,
     googlenew: false,
   };
   try {
@@ -329,10 +328,12 @@ const userProfile = async (req, res) => {
   const _id = id;
   try {
     const user = await User.findById(id);
-    const documents = await documentModel.find({
-      status: "approved",
-      postedBy: _id,
-    });
+    const documents = await documentModel
+      .find({
+        status: "approved",
+        postedBy: _id,
+      })
+      .populate("postedBy", "_id");
 
     if (user) {
       res.status(200).json({ user, documents });

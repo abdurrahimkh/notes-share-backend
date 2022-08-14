@@ -7,7 +7,7 @@ const {
   Approve,
   Reject,
   approvedDocuments,
-  userDocuments,
+  deleteDocument,
   likeDocument,
   valuesControl,
   Search,
@@ -16,6 +16,7 @@ const { requireLogin } = require("../middlewares/requireLogin");
 const router = express.Router();
 
 router.post("/upload", requireLogin, uploadDocument);
+router.delete("/delete/:id", deleteDocument);
 router.get("/documents", AllDocuments);
 router.get("/document/:id", documentDetails);
 router.post("/approve/:id", adminRequireLogin, Approve);
