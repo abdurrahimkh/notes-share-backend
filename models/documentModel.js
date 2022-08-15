@@ -35,10 +35,35 @@ const documentSchema = new mongoose.Schema(
       type: ObjectId,
       ref: "User",
     },
-    likes: {
-      type: [String],
-      default: [],
+    ratings: {
+      type: Number,
+      default: 0,
     },
+    noOfReviews: {
+      type: Number,
+      default: 0,
+    },
+    reviews: [
+      {
+        user: {
+          type: ObjectId,
+          ref: "User",
+        },
+        name: {
+          type: String,
+        },
+        rating: {
+          type: Number,
+        },
+      },
+    ],
+    comments: [
+      {
+        text: String,
+        postedBy: { type: ObjectId, ref: "User" },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,

@@ -11,6 +11,9 @@ const {
   likeDocument,
   valuesControl,
   Search,
+  documentReview,
+  addComment,
+  deleteComment,
 } = require("../controllers/documentController");
 const { requireLogin } = require("../middlewares/requireLogin");
 const router = express.Router();
@@ -25,5 +28,8 @@ router.get("/approved", approvedDocuments);
 router.post("/like/:documentId", requireLogin, likeDocument);
 router.get("/values", valuesControl);
 router.get("/search", Search);
+router.post("/document/review", requireLogin, documentReview);
+router.put("/document/comments", requireLogin, addComment);
+router.delete("/document/comments", requireLogin, deleteComment);
 
 module.exports = router;

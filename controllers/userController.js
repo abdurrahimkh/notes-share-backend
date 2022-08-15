@@ -199,7 +199,16 @@ const completeRegistration = async (req, res) => {
     fieldofstudy,
     googlenew,
   } = req.body;
+  if (!gender || !username || !institute || !dicipline || !fieldofstudy) {
+    res.status(200);
+    return res.json({ error: "Please Add All Fields" });
+  }
   try {
+    const usernameExists = await User.findOne({ username });
+    if (usernameExists) {
+      res.status(200);
+      return res.json({ error: "Username already exists" });
+    }
     const user = await User.findByIdAndUpdate(
       _id,
       {

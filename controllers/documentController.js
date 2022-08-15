@@ -1,3 +1,4 @@
+const { findById } = require("../models/documentModel");
 const documentModel = require("../models/documentModel");
 const valuesModel = require("../models/valuesModel");
 const uploadDocument = async (req, res) => {
@@ -57,7 +58,8 @@ const documentDetails = async (req, res) => {
   try {
     const document = await documentModel
       .findById(id)
-      .populate("postedBy", "name username email pic");
+      .populate("postedBy", "name username email pic")
+      .populate("comments.postedBy", "name pic");
     if (document) {
       res.send(document);
     }
@@ -167,6 +169,96 @@ const Search = async (req, res) => {
   }
 };
 
+const documentReview = async (req, res) => {
+  const { rating, comment, documentId } = req.body;
+  const review = {
+    user: req.user._id,
+    name: req.user.name,
+    rating: Number(rating),
+    comment,
+  };
+  try {
+    const document = await documentModel.findById(documentId);
+    const isReviewed = document.reviews.find(
+      r => r.user.toString() === req.user._id.toString()
+    );
+    if (isReviewed) {
+      document.reviews.forEach(r => {
+        if (r.user.toString() === req.user._id.toString()) {
+          r.comment = comment;
+          r.rating = rating;
+        }
+      });
+    } else {
+      document.reviews.push(review);
+      document.noOfReviews = document.reviews.length;
+    }
+    document.ratings =
+      document.reviews.reduce((acc, item) => item.rating + acc, 0) /
+      document.reviews.length;
+
+    await document.save({ validateBeforeSave: false });
+    const result = await documentModel
+      .findById(documentId)
+      .populate("postedBy", "name username email pic");
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const addComment = async (req, res) => {
+  const id = req.body.id;
+  const text = req.body.text;
+  try {
+    const comment = await documentModel
+      .findByIdAndUpdate(
+        id,
+        {
+          $push: {
+            comments: {
+              text,
+              postedBy: req.user._id,
+            },
+          },
+        },
+        { new: true }
+      )
+      .populate("comments.postedBy", "name pic");
+    if (comment) {
+      res.send(comment);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deleteComment = async (req, res) => {
+  const postId = req.body.postId;
+  const commentId = req.body.commentId;
+  try {
+    const comment = await documentModel
+      .findByIdAndUpdate(
+        postId,
+        {
+          $pull: {
+            comments: {
+              _id: commentId,
+            },
+          },
+        },
+        { new: true }
+      )
+      .populate("postedBy", "name pic")
+      .populate("comments.postedBy", "name pic");
+    if (comment) {
+      res.send(comment);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   uploadDocument,
   documentDetails,
@@ -178,4 +270,7 @@ module.exports = {
   valuesControl,
   Search,
   deleteDocument,
+  documentReview,
+  addComment,
+  deleteComment,
 };
