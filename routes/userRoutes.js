@@ -16,6 +16,7 @@ const {
   profileUpdate,
   passwordUpdate,
   deleteValue,
+  contactUs,
 } = require("../controllers/userController");
 const { adminRequireLogin } = require("../middlewares/adminRequireLogin");
 
@@ -33,5 +34,6 @@ router.put("/deletevalue", deleteValue);
 router.put("/profile/picupdate/:_id", updatePicture);
 router.put("/profile/update", requireLogin, profileUpdate);
 router.put("/profile/passwordupdate", requireLogin, passwordUpdate);
+router.post("/contact-us", contactUs);
 
 module.exports = router;

@@ -16,6 +16,24 @@ const addQuestion = async (req, res) => {
   }
 };
 
+const deleteQuestion = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const deletedDocument = await QuestionModel.findByIdAndDelete(id);
+    if (deletedDocument) {
+      const allDocuments = await QuestionModel.find()
+        .populate("postedBy", "name pic")
+        .sort({ createdAt: -1 });
+      if (allDocuments) {
+        res.status(200).send(allDocuments);
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
 const allQuestions = async (req, res) => {
   try {
     const questions = await QuestionModel.find()
@@ -97,6 +115,7 @@ const questionDetails = async (req, res) => {
 
 module.exports = {
   addQuestion,
+  deleteQuestion,
   allQuestions,
   addAnswer,
   deleteAnswer,

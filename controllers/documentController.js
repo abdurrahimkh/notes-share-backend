@@ -1,4 +1,3 @@
-const { findById } = require("../models/documentModel");
 const documentModel = require("../models/documentModel");
 const valuesModel = require("../models/valuesModel");
 const uploadDocument = async (req, res) => {
@@ -121,6 +120,22 @@ const approvedDocuments = async (req, res) => {
   }
 };
 
+const recentDocuments = async (req, res) => {
+  try {
+    const documents = await documentModel
+      .find({ status: "approved" })
+      .populate("postedBy", "name pic")
+      .sort({ createdAt: -1 })
+      .limit(10);
+    if (documents) {
+      res.status(200).send(documents);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
 const likeDocument = async (req, res) => {
   const { documentId } = req.params;
   const id = req.user._id;
@@ -200,7 +215,8 @@ const documentReview = async (req, res) => {
     await document.save({ validateBeforeSave: false });
     const result = await documentModel
       .findById(documentId)
-      .populate("postedBy", "name username email pic");
+      .populate("postedBy", "name username email pic")
+      .populate("comments.postedBy", "name pic");
     res.send(result);
   } catch (error) {
     console.log(error);
@@ -273,4 +289,5 @@ module.exports = {
   documentReview,
   addComment,
   deleteComment,
+  recentDocuments,
 };

@@ -73,8 +73,38 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const changeEmail = async (req, res) => {
+  const id = req.body.id;
+  const newEmail = req.body.email;
+  const admin = await Admin.findById(id);
+  if (admin) {
+    admin.email = newEmail;
+  }
+  const update = admin.save();
+  if (update) {
+    res.status(201).json({ message: "Email Updated.." });
+  }
+};
+
+const changePassword = async (req, res) => {
+  const newPassword = req.body.password;
+  const id = req.body.id;
+  const admin = await Admin.findById(id);
+  if (admin) {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    admin.password = hashedPassword;
+  }
+  const updated = admin.save();
+  if (updated) {
+    res.status(201).json({ message: "Password Updated Successfully" });
+  }
+};
+
 module.exports = {
   registerAdmin,
   loginAdmin,
   deleteUser,
+  changeEmail,
+  changePassword,
 };
