@@ -42,7 +42,8 @@ const AllDocuments = async (req, res) => {
   try {
     const posts = await documentModel
       .find()
-      .populate("postedBy", "name username email");
+      .populate("postedBy", "name username email")
+      .sort({ createdAt: -1 });
     if (posts) {
       res.status(200).send(posts);
     }
