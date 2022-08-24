@@ -256,7 +256,7 @@ const generateToken = id => {
 
 const allUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().sort({ createdAt: -1 });
     if (users) {
       res.status(200).send(users);
     }
